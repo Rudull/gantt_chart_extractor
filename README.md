@@ -1,82 +1,97 @@
 # Gantt Chart Extractor
 
-This is a Gantt chart extractor that allows you to load and analyze PDF, MPP (Microsoft Project), and XLSX (Excel) files to extract information about tasks and their schedules.
+This tool extracts task information from Gantt charts in PDF, MPP (Microsoft Project), and XLSX (Excel) files.  It provides a user-friendly interface for loading files, filtering tasks, and viewing extracted data.
 
 ## Features
 
-- Loads PDF, MPP, and XLSX files.
-- Automatically extracts tasks with their dates.
-- Advanced filtering system.
-- Keyword search.
-- Saving and loading custom filters.
-- Hierarchical view of tasks (for MPP and XLSX).
-- Intuitive graphical interface.
+- **Supports multiple file formats:**  PDF, MPP, and XLSX.
+- **Automatic task extraction:** Extracts task names, start and end dates, and hierarchical level (for MPP and XLSX).
+- **Advanced filtering:**  Search by keywords, include specific terms, and exclude unwanted terms.
+- **Savable filters:** Save and load custom filter configurations for reuse.
+- **Hierarchical task view:** Displays hierarchical relationships between tasks for MPP and XLSX files.
+- **Intuitive GUI:** Easy-to-use graphical interface built with PySide6.
+
 
 ## Requirements
 
 - Python 3.7+
-- Java JDK 8+ (for processing MPP files)
-- The following Python libraries:
-  - PySide6
-  - pdfplumber
-  - jpype1
-  - mpxj
-  - openpyxl
-  - pandas
+- Java JDK 8+ (required for processing MPP files - ensure JAVA_HOME is set)
+- Python libraries (install via `pip install -r requirements.txt`):
+    - PySide6
+    - pdfplumber
+    - jpype1
+    - mpxj
+    - openpyxl
+    - pandas
 
 ## Installation
 
-1. Clone this repository:
-```bash
-git clone https://github.com/your-username/gantt-chart-extractor.git
-```
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/your-username/gantt-chart-extractor.git
+   ```
+2. **Install dependencies:**
 
-2. Install the dependencies:
-
-**Option 1 - Direct Installation:**
-```bash
-pip install PySide6 pdfplumber jpype1 mpxj pandas openpyxl
-```
-**Option 2 - Using requirements.txt:**
-```bash
-pip install -r requirements.txt
-```
-
-3. Make sure you have JAVA_HOME configured in your system's environment variables if you are going to use MPP files.
+  **Option 1 - Direct Installation:**
+  ```bash
+  pip install PySide6 pdfplumber jpype1 mpxj pandas openpyxl
+  ```
+  **Option 2 - Using requirements.txt:**
+  ```bash
+  pip install -r requirements.txt
+  ```
+3. **Set JAVA_HOME (for MPP files):** Configure the JAVA_HOME environment variable to point to your JDK installation directory.
 
 ## Usage
 
-1. Run the program:
-```bash
-python file_gui.py
-```
-
-2. Use the "Load PDF", "Load MPP", or "Load XLSX" buttons to open files.
-
-3. Use the search and filter bars to find specific tasks:
-   - Search: General search for terms (all words must be present).
-   - Include words: Terms that must be present (at least one word must be present).
-   - Exclude words: Terms that should not appear.
-
-4. You can save and load custom filters using the corresponding buttons. Filters are saved in `.ft` files.
+1. **Run the application:**
+   ```bash
+   python src/file_gui.py
+   ```
+2. **Load a file:** Use the "Load PDF", "Load MPP", or "Load XLSX" buttons to select your Gantt chart file.
+3. **Filter tasks (Optional):**
+    - **Search:** Enter comma-separated keywords. All keywords must be present in the task name.
+    - **Include words:** Enter comma-separated terms. At least one term must be present in the task name.
+    - **Exclude words:** Enter comma-separated terms.  Tasks containing these terms will be hidden.
+4. **Save/Load Filters:** Use the "Save Filter" and "Load Filter" buttons to save and reuse filter configurations.  Filters are saved as `.ft` files.
 
 ## Project Structure
 
-- `file_gui.py`: Main graphical interface.
-- `pdf_extractor.py`: PDF file handling.
-- `mpp_extractor.py`: MPP file handling.
-- `xlsx_extractor.py`: XLSX file handling.
-- `filter_util.py`: Filtering utilities.
-- `loading_animation_widget.py`: Loading animation widget.
+- `src/file_gui.py`: Main GUI application.
+- `src/pdf_extractor.py`: PDF parsing and extraction.
+- `src/mpp_extractor.py`: MPP parsing and extraction.
+- `src/xlsx_extractor.py`: XLSX parsing and extraction.
+- `src/filter_util.py`: Filtering utility functions.
+- `src/loading_animation_widget.py`: Loading animation widget.
+- `requirements.txt`: Project dependencies.
 
 
 ## License
 
-[MIT License](LICENSE)
+MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Contributions
+## Contributing
 
-Contributions are welcome. Please open an issue first to discuss the changes you would like to make.
+Contributions are welcome! Please open an issue to discuss proposed changes before submitting a pull request.
 
----
-For more information or to report issues, please create an issue in the repository.
+
+## Example Filter File (.ft)
+
+```
+Incluir:construcción, diseño
+Excluir:prueba, revisión
+```
+
+
+## Example Schedule (Conceptual - How data might appear in the application)
+
+| Task ID | Level | Task Name         | Start Date | End Date   | File Source |
+|---------|-------|-------------------|------------|------------|-------------|
+| 1       | 0     | Project Start     | 01/01/2024 | 01/01/2024 | example.mpp |
+| 2       | 1     | Phase 1          | 02/01/2024 | 15/01/2024 | example.mpp |
+| 3       | 2     | Design Phase     | 02/01/2024 | 09/01/2024 | example.mpp |
+| 4       | 2     | Build Phase      | 10/01/2024 | 15/01/2024 | example.mpp |
+| 5       | 1     | Phase 2          | 16/01/2024 | 31/01/2024 | example.mpp |
+| ...     | ...   | ...              | ...        | ...        | ...         |
+
+```
