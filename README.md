@@ -1,79 +1,82 @@
 # Gantt Chart Extractor
 
-Este es un extractor de diagramas Gantt que permite cargar y analizar archivos PDF y MPP (Microsoft Project) para extraer información sobre tareas y sus cronogramas.
+This is a Gantt chart extractor that allows you to load and analyze PDF, MPP (Microsoft Project), and XLSX (Excel) files to extract information about tasks and their schedules.
 
-## Características
+## Features
 
-- Carga de archivos PDF y MPP
-- Extracción automática de tareas con sus fechas
-- Sistema de filtrado avanzado
-- Búsqueda por palabras clave
-- Guardado y carga de filtros personalizados
-- Visualización jerárquica de tareas
-- Interfaz gráfica intuitiva
+- Loads PDF, MPP, and XLSX files.
+- Automatically extracts tasks with their dates.
+- Advanced filtering system.
+- Keyword search.
+- Saving and loading custom filters.
+- Hierarchical view of tasks (for MPP and XLSX).
+- Intuitive graphical interface.
 
-## Requisitos
+## Requirements
 
 - Python 3.7+
-- Java JDK 8+ (para el procesamiento de archivos MPP)
-- Las siguientes bibliotecas de Python:
+- Java JDK 8+ (for processing MPP files)
+- The following Python libraries:
   - PySide6
   - pdfplumber
-  - jpype
+  - jpype1
   - mpxj
+  - openpyxl
+  - pandas
 
-## Instalación
+## Installation
 
-1. Clona este repositorio:
+1. Clone this repository:
 ```bash
-git clone https://github.com/tu-usuario/gantt-chart-extractor.git
+git clone https://github.com/your-username/gantt-chart-extractor.git
 ```
 
-2. Instala las dependencias:
+2. Install the dependencies:
+
+**Option 1 - Direct Installation:**
+```bash
+pip install PySide6 pdfplumber jpype1 mpxj pandas openpyxl
 ```
-   **Opción 1 - Instalación directa:**
-   ```bash
-   pip install PySide6 pdfplumber jpype1 mpxj
-   ```
-
-   **Opción 2 - Usando requirements.txt:**
-   ```bash
-   pip install -r requirements.txt
+**Option 2 - Using requirements.txt:**
+```bash
+pip install -r requirements.txt
 ```
 
-3. Asegúrate de tener configurado JAVA.
+3. Make sure you have JAVA_HOME configured in your system's environment variables if you are going to use MPP files.
 
-## Uso
+## Usage
 
-1. Ejecuta el programa:
+1. Run the program:
 ```bash
 python file_gui.py
 ```
 
-2. Usa los botones "Cargar PDF" o "Cargar MPP" para abrir archivos.
+2. Use the "Load PDF", "Load MPP", or "Load XLSX" buttons to open files.
 
-3. Utiliza las barras de búsqueda y filtro para encontrar tareas específicas:
-   - Buscador: búsqueda general de términos
-   - Incluir palabras: términos que deben estar presentes
-   - Excluir palabras: términos que no deben aparecer
+3. Use the search and filter bars to find specific tasks:
+   - Search: General search for terms (all words must be present).
+   - Include words: Terms that must be present (at least one word must be present).
+   - Exclude words: Terms that should not appear.
 
-4. Puedes guardar y cargar filtros personalizados usando los botones correspondientes.
+4. You can save and load custom filters using the corresponding buttons. Filters are saved in `.ft` files.
 
-## Estructura del Proyecto
+## Project Structure
 
-- `file_gui.py`: Interfaz gráfica principal
-- `pdf_extractor.py`: Manejo de archivos PDF
-- `mpp_extractor.py`: Manejo de archivos MPP
-- `filter_util.py`: Utilidades de filtrado
-- `loading_animation_widget.py`: Widget de animación de carga
+- `file_gui.py`: Main graphical interface.
+- `pdf_extractor.py`: PDF file handling.
+- `mpp_extractor.py`: MPP file handling.
+- `xlsx_extractor.py`: XLSX file handling.
+- `filter_util.py`: Filtering utilities.
+- `loading_animation_widget.py`: Loading animation widget.
 
-## Licencia
+
+## License
 
 [MIT License](LICENSE)
 
-## Contribuciones
+## Contributions
 
-Las contribuciones son bienvenidas. Por favor, abre un issue primero para discutir los cambios que te gustaría hacer.
+Contributions are welcome. Please open an issue first to discuss the changes you would like to make.
 
 ---
-Para más información o reportar problemas, por favor crea un issue en el repositorio.
+For more information or to report issues, please create an issue in the repository.

@@ -1,5 +1,5 @@
 #file_gui.py
-#7
+#
 import sys
 import os
 import platform
@@ -35,8 +35,6 @@ class MPPLoaderThread(QThread):
             from filter_util import is_start_end_task
 
             mpp_reader = MPPReader()
-
-            # Ya no iniciamos la JVM aquí
 
             tasks = []
             task_tree = []
@@ -87,6 +85,44 @@ class MPPLoaderThread(QThread):
             traceback.print_exc()
             self.tasks_extracted.emit([], [])
 
+class XLSXLoaderThread(QThread):
+    tasks_extracted = Signal(list, list)
+
+    def __init__(self, file_path):
+        super().__init__()
+        self.file_path = file_path
+
+    def run(self):
+        try:
+            from xlsx_extractor import XLSXReader
+            from filter_util import is_start_end_task
+
+            xlsx_reader = XLSXReader()
+            tasks = xlsx_reader.read_xlsx(self.file_path)
+
+            task_tree = []
+            for task in tasks:
+                if not is_start_end_task(task['name']):
+                    task_tree.append(TaskTreeNode(task))
+
+            # Construir jerarquía
+            for i in range(len(task_tree)):
+                node = task_tree[i]
+                if i > 0:
+                    for j in range(i - 1, -1, -1):
+                        potential_parent = task_tree[j]
+                        if potential_parent.task['outline_level'] < node.task['outline_level']:
+                            potential_parent.children.append(node)
+                            break
+
+            self.tasks_extracted.emit(tasks, task_tree)
+
+        except Exception as e:
+            print(f"Error al extraer tareas XLSX: {e}")
+            import traceback
+            traceback.print_exc()
+            self.tasks_extracted.emit([], [])
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -113,6 +149,12 @@ class MainWindow(QMainWindow):
         self.load_mpp_button.clicked.connect(self.load_mpp_file)
         self.load_mpp_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         button_layout.addWidget(self.load_mpp_button)
+
+        # Botón para cargar archivo XLSX
+        self.load_xlsx_button = QPushButton("Cargar XLSX")
+        self.load_xlsx_button.clicked.connect(self.load_xlsx_file)
+        self.load_xlsx_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        button_layout.addWidget(self.load_xlsx_button)
 
         # Botón para guardar filtro
         self.save_filter_button = QPushButton("Guardar Filtro")
@@ -244,13 +286,18 @@ class MainWindow(QMainWindow):
     def load_mpp_file(self):
         self.load_file(file_type='mpp')
 
+    def load_xlsx_file(self):
+        self.load_file(file_type='xlsx')
+
     def load_file(self, file_type=None):
         if file_type == 'pdf':
             file_filter = "Archivos PDF (*.pdf)"
         elif file_type == 'mpp':
             file_filter = "Archivos MPP (*.mpp)"
+        elif file_type == 'xlsx':
+            file_filter = "Archivos Excel (*.xlsx)"
         else:
-            file_filter = "Archivos (*.pdf *.mpp)"
+            file_filter = "Archivos (*.pdf *.mpp *.xlsx)"
 
         file_name, _ = QFileDialog.getOpenFileName(self, "Abrir Archivo", "", file_filter)
         if file_name:
@@ -258,17 +305,21 @@ class MainWindow(QMainWindow):
             self.show_loading(True)
             self.load_pdf_button.setEnabled(False)
             self.load_mpp_button.setEnabled(False)
+            self.load_xlsx_button.setEnabled(False)
 
-            # Determina el tipo de archivo y utiliza el hilo de carga adecuado
             if file_name.lower().endswith('.pdf'):
                 self.loader_thread = PDFLoaderThread(file_name)
             elif file_name.lower().endswith('.mpp'):
                 self.loader_thread = MPPLoaderThread(file_name)
+            elif file_name.lower().endswith('.xlsx'):
+                self.loader_thread = XLSXLoaderThread(file_name)
             else:
-                QMessageBox.warning(self, "Archivo no soportado", "Por favor seleccione un archivo PDF o MPP.")
+                QMessageBox.warning(self, "Archivo no soportado",
+                                  "Por favor seleccione un archivo PDF, MPP o XLSX.")
                 self.show_loading(False)
                 self.load_pdf_button.setEnabled(True)
                 self.load_mpp_button.setEnabled(True)
+                self.load_xlsx_button.setEnabled(True)
                 return
 
             self.loader_thread.tasks_extracted.connect(self.on_tasks_extracted)
@@ -281,6 +332,7 @@ class MainWindow(QMainWindow):
         self.show_loading(False)
         self.load_pdf_button.setEnabled(True)
         self.load_mpp_button.setEnabled(True)
+        self.load_xlsx_button.setEnabled(True)
 
     def show_loading(self, show):
         if show:
@@ -306,9 +358,17 @@ class MainWindow(QMainWindow):
                 display_name = '    ' * indentation + task_name
                 self.table.setItem(row, 2, QTableWidgetItem(display_name))
 
-                # Fechas
-                self.table.setItem(row, 3, QTableWidgetItem(str(task.get('start_date', ''))))
-                self.table.setItem(row, 4, QTableWidgetItem(str(task.get('end_date', ''))))
+                # Fechas con verificación
+                start_date = task.get('start_date', '')
+                end_date = task.get('end_date', '')
+
+                if not start_date:
+                    start_date = "N/A"
+                if not end_date:
+                    end_date = "N/A"
+
+                self.table.setItem(row, 3, QTableWidgetItem(str(start_date)))
+                self.table.setItem(row, 4, QTableWidgetItem(str(end_date)))
 
                 # Archivo fuente
                 self.table.setItem(row, 5, QTableWidgetItem(self.source_file))
